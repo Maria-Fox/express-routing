@@ -10,9 +10,8 @@ function stringToNums(stringNumbers) {
     // console.log(number);
 
     if (Number.isNaN(number)) {
-      return new GlobalError(
-        "You have submitted something other than a number. Please resubmit using integers only.",
-        400
+      return new Error(
+        "You have submitted something other than an integer. Please resubmit using integers only."
       );
     }
     result.push(number);
@@ -22,14 +21,18 @@ function stringToNums(stringNumbers) {
 
 function findMean(nums) {
   let mean = 0;
+  console.log(mean);
   if (nums.length == 0) {
     return 0;
   } else {
-    for (let num in nums) {
-      mean += num;
+    for (let i = 0; i < nums.length; i++) {
+      mean = mean + nums[i];
+      console.log(mean);
     }
+    console.log(mean / nums.length);
     return mean / nums.length;
   }
+  return mean / nums.length;
 }
 
 function findMedian(nums) {

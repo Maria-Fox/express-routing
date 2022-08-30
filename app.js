@@ -12,6 +12,7 @@ const app = express();
 app.get("/mean", function (req, res, next) {
   // if no key/ value query was found return error
   if (!req.query.nums) {
+    console.log("this hit");
     throw new GlobalError(
       "Please submit a query string with a key of 'nums'. Ex:/mean?nums=1,3,5,7.",
       400
@@ -22,7 +23,7 @@ app.get("/mean", function (req, res, next) {
   let reqQuery = req.query;
   let stringNumbers = reqQuery.nums.split(",");
 
-  // returns nums array || error message #'s were not passed in
+  // returns nums array || error message if #'s were not passed in
   let numsResp = stringToNums(stringNumbers);
   console.log(` nums resp = ${numsResp}`);
 
@@ -52,7 +53,7 @@ app.get("/median", function (req, res, next) {
   let numsResp = stringToNums(stringNums);
 
   if (numsResp instanceof Error) {
-    throw new GlobalError(numsResp.message);
+    throw new GlobalError(numsResp.message, 400);
   }
 
   let median = findMedian(numsResp);
@@ -87,22 +88,24 @@ app.get("/mode", function (req, res, next) {
 // general error handing- must pass in error and next
 
 app.use(function (req, res, next) {
-  const err = new ExpressError("Not Found", 404);
-  console.log(`first error route hit ${err}`);
+  const err = new GlobalError("Not Found", 404);
 
-  // pass the error to the next error handler
+  // pass the error to the next eror handler to retrn json response
   return next(err);
 });
 
-app.use(function (err, req, res, next) {
-  let status = err.status || 500;
-  let message = err.message;
+// specific to those who are passing in an error
 
-  //must send a return value assign status + message you want passed in
-  return res.status(status).json((obj = { status, message }));
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500);
+
+  return res.json({
+    error: err,
+    // message: err.message,
+  });
 });
 
-// ensure the server is listening/setup is working. binds server to port
+// ensure the server is listening/setup is working. binds server to port- keep at bottom of file
 
 app.listen(5000, function () {
   console.log("Server is running on port 5000.");
